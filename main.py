@@ -9,6 +9,9 @@ client = OpenAI(api_key=API_KEY)
 value = st.chat_input("Prompt")
 
 if (value):
+    with (st.chat_message("user")):
+        txt = st.write(value)
+        
     with (st.chat_message("assistant")):
         txt = st.header("Waiting for api...")
 
