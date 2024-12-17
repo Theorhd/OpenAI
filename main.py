@@ -34,7 +34,7 @@ def new_message(content: str, model: str):
 def openai_create_image(prompt: str):
     try:
         response = client.images.generate(
-            model="dalle-2",
+            model="dall-e-2"
             prompt=prompt,
             n=1,
             size="240x240"
