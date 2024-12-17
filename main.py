@@ -6,10 +6,11 @@ API_KEY = os.getenv("api_key")
 
 client = OpenAI(api_key=API_KEY)
 
-value = st.text_input("Prompt")
+value = st.chat_input("Prompt")
 
 if (value):
-    txt = st.header("Waiting for api...")
+    with (st.chat_message("assistant")):
+        txt = st.header("Waiting for api...")
 
     completion = client.chat.completions.create(
         model="gpt-4o-mini",
