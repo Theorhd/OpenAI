@@ -17,6 +17,8 @@ def new_message(content: str, model: str):
         handle_chatgpt_response(content)
     elif model == "DALL-E":
         handle_dalle_response(content)
+    elif model == "Python Code Expert":
+        handle_python_expert_response(content)
 
 def handle_chatgpt_response(content: str):
     with st.chat_message("assistant"):
@@ -33,6 +35,20 @@ def handle_dalle_response(content: str):
     image_url = openai_create_image(content)
     st.session_state.messages.append({"role": "assistant", "content": image_url})
     st.image(image_url)
+
+def handle_python_expert_response(content: str):
+    with st.chat_message("assistant"):
+        txt = st.header("Waiting for response...")
+        completion = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "Tu es un expert en code Python. Réponds en format Markdown et aide à comprendre et corriger le code Python."},
+                {"role": "user", "content": content}
+            ]
+        )
+        response_content = completion.choices[0].message.content
+        st.session_state.messages.append({"role": "assistant", "content": response_content})
+        txt.text(response_content)
 
 def openai_create_image(prompt: str):
     try:
@@ -69,7 +85,7 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.write(message["content"])
 
-model = st.selectbox("Choisi ton modèle", ["ChatGPT", "DALL-E", "Générateur d'articles"])
+model = st.selectbox("Choisi ton modèle", ["ChatGPT", "DALL-E", "Générateur d'articles", "Python Code Expert"])
 value = st.chat_input("Your message here")
 if value and value != "" and model != "Générateur d'articles":
     new_message(value, model)
