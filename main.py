@@ -23,9 +23,10 @@ def new_message(content: str, model: str):
 def handle_chatgpt_response(content: str):
     with st.chat_message("assistant"):
         txt = st.header("Waiting for response...")
+        messages = st.session_state.messages + [{"role": "user", "content": content}]
         completion = client.chat.completions.create(
             model="gpt-4o-mini",
-            messages=[{"role": "user", "content": content}]
+            messages=messages
         )
         response_content = completion.choices[0].message.content
         st.session_state.messages.append({"role": "assistant", "content": response_content})
@@ -39,12 +40,10 @@ def handle_dalle_response(content: str):
 def handle_python_expert_response(content: str):
     with st.chat_message("assistant"):
         txt = st.header("Waiting for response...")
+        messages = st.session_state.messages + [{"role": "user", "content": content}]
         completion = client.chat.completions.create(
             model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": "Tu es un expert en code Python. Réponds en format Markdown et aide à comprendre et corriger le code Python."},
-                {"role": "user", "content": content}
-            ]
+            messages=messages
         )
         response_content = completion.choices[0].message.content
         st.session_state.messages.append({"role": "assistant", "content": response_content})
