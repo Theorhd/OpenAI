@@ -45,7 +45,7 @@ def handle_chatgpt_response(content: str):
                 chunk_text = chunk.choices[0].delta.content
                 full_text += chunk_text
                 txt.markdown(full_text)
-                st.session_state.messages.append({"role": "assistant", "content": full_text})
+        st.session_state.messages.append({"role": "assistant", "content": full_text})
 
 def handle_dalle_response(content: str):
     image_url = openai_create_image(content)
