@@ -140,7 +140,7 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.write(message["content"])
 
-model = st.selectbox("Choisi ton modèle", ["GPT-4o-mini", "GPT-4o", "GPT-o1-mini", "GPT-o1-preview", "GPT 3.5 Turbo", "DALL-E", "Générateur d'articles", "Python Code Expert"])
+model = st.selectbox("Choisi ton modèle", ["GPT-4o-mini", "GPT-4o", "GPT 3.5 Turbo", "DALL-E", "GPT-o1-mini", "GPT-o1-preview", "Python Code Expert", "Générateur d'articles"])
 value = st.chat_input("Your message here")
 if value and value != "" and model != "Générateur d'articles":
     new_message(value, model)
