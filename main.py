@@ -32,12 +32,17 @@ def new_message(content: str, model: str):
         st.image(image_url)
 
 def openai_create_image(prompt: str):
-    response = client.images.generate(
-        prompt=prompt,
-        n=1,
-        size="240x240"
-    )
-    return response.data[0].url
+    try:
+        response = client.images.generate(
+            model="dalle-2",
+            prompt=prompt,
+            n=1,
+            size="240x240"
+        )
+        return response.data[0].url
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
+        return None
 
 def generate_article(topic: str):
     st.header(f"Article on {topic}")
@@ -55,7 +60,8 @@ def generate_article(topic: str):
     # Generate images
     for _ in range(2):
         image_url = openai_create_image(f"Image about {topic}")
-        st.image(image_url)
+        if image_url:
+            st.image(image_url)
 
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
