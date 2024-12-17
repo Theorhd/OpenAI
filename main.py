@@ -9,27 +9,30 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 def new_message(content: str, model: str):
-    with (st.chat_message("user")):
+    with st.chat_message("user"):
         st.session_state.messages.append({"role": "user", "content": content})
         st.write(content)
     
     if model == "ChatGPT":
-        with (st.chat_message("assistant")):
-            txt = st.header("Waiting for response...")
-
-            completion = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[
-                    {"role": "user", "content": content}
-                ]
-            )
-
-            st.session_state.messages.append({"role": "assistant", "content": completion.choices[0].message.content})
-            txt.text(completion.choices[0].message.content)
+        handle_chatgpt_response(content)
     elif model == "DALL-E":
-        image_url = openai_create_image(content)
-        st.session_state.messages.append({"role": "assistant", "content": image_url})
-        st.image(image_url)
+        handle_dalle_response(content)
+
+def handle_chatgpt_response(content: str):
+    with st.chat_message("assistant"):
+        txt = st.header("Waiting for response...")
+        completion = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": content}]
+        )
+        response_content = completion.choices[0].message.content
+        st.session_state.messages.append({"role": "assistant", "content": response_content})
+        txt.text(response_content)
+
+def handle_dalle_response(content: str):
+    image_url = openai_create_image(content)
+    st.session_state.messages.append({"role": "assistant", "content": image_url})
+    st.image(image_url)
 
 def openai_create_image(prompt: str):
     try:
@@ -46,11 +49,10 @@ def openai_create_image(prompt: str):
 
 def generate_article(topic: str):
     st.header(f"Article on {topic}")
-    
     completion = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
-            {"role": "system", "content": f"Tu es un assistant qui rédige des articles. Ta taches est de générer 3 paragraphes par sujet qui te seront demandés."},
+            {"role": "system", "content": "Tu es un assistant qui rédige des articles. Ta taches est de générer 3 paragraphes par sujet qui te seront demandés."},
             {"role": "user", "content": f"Rédige un article sur le sujet : {topic}"}
         ]
     )
