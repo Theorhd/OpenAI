@@ -13,8 +13,16 @@ def new_message(content: str, model: str):
         st.session_state.messages.append({"role": "user", "content": content})
         st.write(content)
     
-    if model == "ChatGPT":
+    if model == "GPT-4o":
+        handle_gpt4o_response(content)
+    elif model == "GPT-4o-mini":
         handle_chatgpt_response(content)
+    elif model == "GPT-o1-mini":
+        handle_gpto1mini_response(content)
+    elif model == "GPT-o1-preview":
+        handle_gpto1preview_response(content)
+    elif model == "GPT 3.5 Turbo":
+        handle_gpt35turbo_response(content)
     elif model == "DALL-E":
         handle_dalle_response(content)
     elif model == "Python Code Expert":
@@ -48,6 +56,54 @@ def handle_python_expert_response(content: str):
         response_content = completion.choices[0].message.content
         st.session_state.messages.append({"role": "assistant", "content": response_content})
         txt.markdown(response_content)
+
+def handle_gpt4o_response(content: str):
+    with st.chat_message("assistant"):
+        txt = st.header("Waiting for response...")
+        messages = st.session_state.messages + [{"role": "user", "content": content}]
+        completion = client.chat.completions.create(
+            model="gpt-4o",
+            messages=messages
+        )
+        response_content = completion.choices[0].message.content
+        st.session_state.messages.append({"role": "assistant", "content": response_content})
+        txt.text(response_content)
+
+def handle_gpto1mini_response(content: str):
+    with st.chat_message("assistant"):
+        txt = st.header("Waiting for response...")
+        messages = st.session_state.messages + [{"role": "user", "content": content}]
+        completion = client.chat.completions.create(
+            model="gpt-o1-mini",
+            messages=messages
+        )
+        response_content = completion.choices[0].message.content
+        st.session_state.messages.append({"role": "assistant", "content": response_content})
+        txt.text(response_content)
+
+def handle_gpto1preview_response(content: str):
+    with st.chat_message("assistant"):
+        txt = st.header("Waiting for response...")
+        messages = st.session_state.messages + [{"role": "user", "content": content}]
+        completion = client.chat.completions.create(
+            model="gpt-o1-preview",
+            messages=messages
+        )
+        response_content = completion.choices[0].message.content
+        st.session_state.messages.append({"role": "assistant", "content": response_content})
+        txt.text(response_content)
+
+def handle_gpt35turbo_response(content: str):
+    with st.chat_message("assistant"):
+        txt = st.header("Waiting for response...")
+        messages = st.session_state.messages + [{"role": "user", "content": content}]
+        completion = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=messages
+        )
+        response_content = completion.choices[0].message.content
+        st.session_state.messages.append({"role": "assistant", "content": response_content})
+        txt.text(response_content)
 
 def openai_create_image(prompt: str):
     try:
@@ -84,7 +140,7 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.write(message["content"])
 
-model = st.selectbox("Choisi ton modèle", ["ChatGPT", "DALL-E", "Générateur d'articles", "Python Code Expert"])
+model = st.selectbox("Choisi ton modèle", ["GPT-4o", "GPT-4o-mini", "GPT-o1-mini", "GPT-o1-preview", "GPT 3.5 Turbo", "DALL-E", "Générateur d'articles", "Python Code Expert"])
 value = st.chat_input("Your message here")
 if value and value != "" and model != "Générateur d'articles":
     new_message(value, model)
