@@ -48,7 +48,7 @@ def handle_python_expert_response(content: str):
         )
         response_content = completion.choices[0].message.content
         st.session_state.messages.append({"role": "assistant", "content": response_content})
-        txt.text(response_content)
+        txt.markdown(response_content)
 
 def openai_create_image(prompt: str):
     try:
