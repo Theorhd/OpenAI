@@ -34,20 +34,12 @@ def handle_chatgpt_response(content: str):
         messages = st.session_state.messages + [{"role": "user", "content": content}]
         completion = client.chat.completions.create(
             model="gpt-4o-mini",
-            messages=messages,
-            stream=True,
+            messages=messages
         )
-
-        for message in completion.stream():
-            if message.choices:
-                response_content = message.choices[0].message.content
-                st.session_state.messages.append({"role": "assistant", "content": response_content})
-                txt.text(response_content)
-
 
         response_content = completion.choices[0].message.content
         st.session_state.messages.append({"role": "assistant", "content": response_content})
-        txt.text(response_content)
+        txt.markdown(response_content)
 
 def handle_dalle_response(content: str):
     image_url = openai_create_image(content)
@@ -76,7 +68,7 @@ def handle_gpt4o_response(content: str):
         )
         response_content = completion.choices[0].message.content
         st.session_state.messages.append({"role": "assistant", "content": response_content})
-        txt.text(response_content)
+        txt.markdown(response_content)
 
 def handle_gpto1mini_response(content: str):
     with st.chat_message("assistant"):
@@ -88,7 +80,7 @@ def handle_gpto1mini_response(content: str):
         )
         response_content = completion.choices[0].message.content
         st.session_state.messages.append({"role": "assistant", "content": response_content})
-        txt.text(response_content)
+        txt.markdown(response_content)
 
 def handle_gpto1preview_response(content: str):
     with st.chat_message("assistant"):
@@ -100,7 +92,7 @@ def handle_gpto1preview_response(content: str):
         )
         response_content = completion.choices[0].message.content
         st.session_state.messages.append({"role": "assistant", "content": response_content})
-        txt.text(response_content)
+        txt.markdown(response_content)
 
 def handle_gpt35turbo_response(content: str):
     with st.chat_message("assistant"):
@@ -112,7 +104,7 @@ def handle_gpt35turbo_response(content: str):
         )
         response_content = completion.choices[0].message.content
         st.session_state.messages.append({"role": "assistant", "content": response_content})
-        txt.text(response_content)
+        txt.markdown(response_content)
 
 def openai_create_image(prompt: str):
     try:
@@ -137,7 +129,7 @@ def generate_article(topic: str):
         ]
     )
     article_content = completion.choices[0].message.content
-    st.write(article_content)
+    st.markdown(article_content)
     
     # Generate images
     for _ in range(2):
