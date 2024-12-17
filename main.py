@@ -42,12 +42,11 @@ def openai_create_image(prompt: str):
 def generate_article(topic: str):
     st.header(f"Article on {topic}")
     
-    # Generate paragraphs
-    for _ in range(3):
+    for i in range(3):
         completion = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "user", "content": f"Write a paragraph about {topic}"}
+                {"role": "user", "content": f"Write paragraph {i+1} about {topic}"}
             ]
         )
         paragraph = completion.choices[0].message.content
