@@ -157,8 +157,7 @@ def generate_article(topic: str):
         messages=[
             {"role": "system", "content": "Tu es un assistant qui rédige des articles. Ta taches est de générer 3 paragraphes par sujet qui te seront demandés."},
             {"role": "user", "content": f"Rédige un article sur le sujet : {topic}"}
-        ],
-        stream=True
+        ]
     )
     article_content = completion.choices[0].message.content
     st.markdown(article_content)
