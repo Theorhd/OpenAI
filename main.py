@@ -59,7 +59,7 @@ def generate_article(topic: str):
     
     # Generate images
     for _ in range(2):
-        image_url = openai_create_image(f"Image about {topic}")
+        image_url = openai_create_image(f"Crée une image d'illustration pour un article sur : {topic}. Tes images doivent être en rapport avec le sujet.")
         if image_url:
             st.image(image_url)
 
