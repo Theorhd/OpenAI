@@ -34,8 +34,17 @@ def handle_chatgpt_response(content: str):
         messages = st.session_state.messages + [{"role": "user", "content": content}]
         completion = client.chat.completions.create(
             model="gpt-4o-mini",
-            messages=messages
+            messages=messages,
+            stream=True,
         )
+
+        for message in completion.stream():
+            if message.choices:
+                response_content = message.choices[0].message.content
+                st.session_state.messages.append({"role": "assistant", "content": response_content})
+                txt.text(response_content)
+
+
         response_content = completion.choices[0].message.content
         st.session_state.messages.append({"role": "assistant", "content": response_content})
         txt.text(response_content)
