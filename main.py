@@ -173,6 +173,9 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.write(message["content"])
 
+if st.button("Clear Chat"):
+    st.session_state.messages = []
+
 model = st.selectbox("Choisi ton modèle", ["GPT-4o-mini", "GPT-4o", "GPT 3.5 Turbo", "DALL-E", "GPT-o1-mini", "GPT-o1-preview", "Python Code Expert", "Générateur d'articles"])
 value = st.chat_input("Your message here")
 if value and value != "" and model != "Générateur d'articles":
