@@ -35,10 +35,28 @@ def openai_create_image(prompt: str):
     response = client.images.generate(
         prompt=prompt,
         n=1,
-        size="1024x1024"
+        size="240x240"
     )
     return response.data[0].url
 
+def generate_article(topic: str):
+    st.header(f"Article on {topic}")
+    
+    # Generate paragraphs
+    for _ in range(3):
+        completion = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "user", "content": f"Write a paragraph about {topic}"}
+            ]
+        )
+        paragraph = completion.choices[0].message.content
+        st.write(paragraph)
+    
+    # Generate images
+    for _ in range(2):
+        image_url = openai_create_image(f"Image about {topic}")
+        st.image(image_url)
 
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
@@ -49,3 +67,7 @@ value = st.chat_input("Your message here")
 if value and value != "":
     new_message(value, model)
     value = ""
+
+topic = st.text_input("Enter a topic for the article")
+if topic:
+    generate_article(topic)
