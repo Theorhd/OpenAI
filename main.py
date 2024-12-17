@@ -160,7 +160,7 @@ def generate_article(topic: str):
         ]
     )
     article_content = completion.choices[0].message.content
-    st.markdown(article_content)
+    st.text(article_content)
     
     # Generate images
     for _ in range(2):
