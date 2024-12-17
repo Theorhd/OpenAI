@@ -34,10 +34,10 @@ def new_message(content: str, model: str):
 def openai_create_image(prompt: str):
     try:
         response = client.images.generate(
-            model="dall-e-2",
+            model="dall-e-3",
             prompt=prompt,
             n=1,
-            size="256x256"
+            size="1024x1024"
         )
         return response.data[0].url
     except Exception as e:
