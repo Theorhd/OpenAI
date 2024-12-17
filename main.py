@@ -58,11 +58,16 @@ def handle_python_expert_response(content: str):
         messages = st.session_state.messages + [{"role": "user", "content": content}]
         completion = client.chat.completions.create(
             model="gpt-4o-mini",
-            messages=messages
+            messages=messages,
+            stream=True
         )
-        response_content = completion.choices[0].message.content
-        st.session_state.messages.append({"role": "assistant", "content": response_content})
-        txt.markdown(response_content)
+        full_text = ""
+        for chunk in completion:
+            if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta.content is not None:
+                chunk_text = chunk.choices[0].delta.content
+                full_text += chunk_text
+                txt.markdown(full_text)
+        st.session_state.messages.append({"role": "assistant", "content": full_text})
 
 def handle_gpt4o_response(content: str):
     with st.chat_message("assistant"):
@@ -70,11 +75,16 @@ def handle_gpt4o_response(content: str):
         messages = st.session_state.messages + [{"role": "user", "content": content}]
         completion = client.chat.completions.create(
             model="gpt-4o",
-            messages=messages
+            messages=messages,
+            stream=True
         )
-        response_content = completion.choices[0].message.content
-        st.session_state.messages.append({"role": "assistant", "content": response_content})
-        txt.markdown(response_content)
+        full_text = ""
+        for chunk in completion:
+            if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta.content is not None:
+                chunk_text = chunk.choices[0].delta.content
+                full_text += chunk_text
+                txt.markdown(full_text)
+        st.session_state.messages.append({"role": "assistant", "content": full_text})
 
 def handle_gpto1mini_response(content: str):
     with st.chat_message("assistant"):
@@ -82,11 +92,16 @@ def handle_gpto1mini_response(content: str):
         messages = st.session_state.messages + [{"role": "user", "content": content}]
         completion = client.chat.completions.create(
             model="gpt-o1-mini",
-            messages=messages
+            messages=messages,
+            stream=True
         )
-        response_content = completion.choices[0].message.content
-        st.session_state.messages.append({"role": "assistant", "content": response_content})
-        txt.markdown(response_content)
+        full_text = ""
+        for chunk in completion:
+            if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta.content is not None:
+                chunk_text = chunk.choices[0].delta.content
+                full_text += chunk_text
+                txt.markdown(full_text)
+        st.session_state.messages.append({"role": "assistant", "content": full_text})
 
 def handle_gpto1preview_response(content: str):
     with st.chat_message("assistant"):
@@ -94,11 +109,16 @@ def handle_gpto1preview_response(content: str):
         messages = st.session_state.messages + [{"role": "user", "content": content}]
         completion = client.chat.completions.create(
             model="gpt-o1-preview",
-            messages=messages
+            messages=messages,
+            stream=True
         )
-        response_content = completion.choices[0].message.content
-        st.session_state.messages.append({"role": "assistant", "content": response_content})
-        txt.markdown(response_content)
+        full_text = ""
+        for chunk in completion:
+            if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta.content is not None:
+                chunk_text = chunk.choices[0].delta.content
+                full_text += chunk_text
+                txt.markdown(full_text)
+        st.session_state.messages.append({"role": "assistant", "content": full_text})
 
 def handle_gpt35turbo_response(content: str):
     with st.chat_message("assistant"):
@@ -106,11 +126,16 @@ def handle_gpt35turbo_response(content: str):
         messages = st.session_state.messages + [{"role": "user", "content": content}]
         completion = client.chat.completions.create(
             model="gpt-3.5-turbo",
-            messages=messages
+            messages=messages,
+            stream=True
         )
-        response_content = completion.choices[0].message.content
-        st.session_state.messages.append({"role": "assistant", "content": response_content})
-        txt.markdown(response_content)
+        full_text = ""
+        for chunk in completion:
+            if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta.content is not None:
+                chunk_text = chunk.choices[0].delta.content
+                full_text += chunk_text
+                txt.markdown(full_text)
+        st.session_state.messages.append({"role": "assistant", "content": full_text})
 
 def openai_create_image(prompt: str):
     try:
@@ -132,7 +157,8 @@ def generate_article(topic: str):
         messages=[
             {"role": "system", "content": "Tu es un assistant qui rédige des articles. Ta taches est de générer 3 paragraphes par sujet qui te seront demandés."},
             {"role": "user", "content": f"Rédige un article sur le sujet : {topic}"}
-        ]
+        ],
+        stream=True
     )
     article_content = completion.choices[0].message.content
     st.markdown(article_content)
