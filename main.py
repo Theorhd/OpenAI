@@ -48,7 +48,7 @@ def openai_create_image(prompt: str):
         return None
 
 def generate_article(topic: str):
-    st.header(f"Article on {topic}")
+    st.header(f"Génération de l'article sur le sujet : {topic} ...")
     completion = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
@@ -69,13 +69,13 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.write(message["content"])
 
-model = st.selectbox("Choose a model", ["ChatGPT", "DALL-E", "Article Generator"])
+model = st.selectbox("Choisi ton modèle", ["ChatGPT", "DALL-E", "Générateur d'articles"])
 value = st.chat_input("Your message here")
-if value and value != "" and model != "Article Generator":
+if value and value != "" and model != "Générateur d'articles":
     new_message(value, model)
     value = ""
 
-if model == "Article Generator":
+if model == "Générateur d'articles":
     topic = st.text_input("Enter a topic for the article")
     if topic:
         generate_article(topic)
