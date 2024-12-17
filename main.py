@@ -37,7 +37,7 @@ def openai_create_image(prompt: str):
             model="dall-e-2",
             prompt=prompt,
             n=1,
-            size="240x240"
+            size="256x256"
         )
         return response.data[0].url
     except Exception as e:
