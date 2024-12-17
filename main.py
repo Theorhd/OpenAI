@@ -1,6 +1,7 @@
 from openai import OpenAI
 import os
 import streamlit as st
+import time
 
 API_KEY = os.getenv("api_key")
 client = OpenAI(api_key=API_KEY)
@@ -34,8 +35,17 @@ def handle_chatgpt_response(content: str):
         messages = st.session_state.messages + [{"role": "user", "content": content}]
         completion = client.chat.completions.create(
             model="gpt-4o-mini",
-            messages=messages
+            messages=messages,
+            stream=True
         )
+
+        full_text = ""
+        for chunk in completion:
+            if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta.content is not None:
+                chunk_text = chunk.choices[0].delta.content
+                full_text += chunk_text
+                txt.markdown(full_text)
+                time.sleep(0.1)
 
         response_content = completion.choices[0].message.content
         st.session_state.messages.append({"role": "assistant", "content": response_content})
