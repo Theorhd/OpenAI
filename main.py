@@ -62,12 +62,13 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.write(message["content"])
 
-model = st.selectbox("Choose a model", ["ChatGPT", "DALL-E"])
+model = st.selectbox("Choose a model", ["ChatGPT", "DALL-E", "Article Generator"])
 value = st.chat_input("Your message here")
-if value and value != "":
+if value and value != "" and model != "Article Generator":
     new_message(value, model)
     value = ""
 
-topic = st.text_input("Enter a topic for the article")
-if topic:
-    generate_article(topic)
+if model == "Article Generator":
+    topic = st.text_input("Enter a topic for the article")
+    if topic:
+        generate_article(topic)
