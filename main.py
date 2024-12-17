@@ -32,12 +32,12 @@ def new_message(content: str, model: str):
         st.image(image_url)
 
 def openai_create_image(prompt: str):
-    response = client.images.generate(  # Use Image.create directly
+    response = client.images.generate(
         prompt=prompt,
         n=1,
         size="1024x1024"
     )
-    return response['data'][0]['url']
+    return response.data[0].url
 
 
 for message in st.session_state.messages:
