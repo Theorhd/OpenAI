@@ -204,6 +204,3 @@ if model == "Générateur d'articles":
     topic = st.text_input("Enter a topic for the article")
     if topic:
         generate_article(topic)
-
-elif model == "Whisper":
-    st.audio_input("Record your voice here...")
