@@ -107,7 +107,7 @@ def handle_stt_to_gpt4o_to_tts_no_translation():
                     model="whisper-1",
                     file=file
                 )
-                st.write("Transcribed text : " + transcription.text)
+                st.write("Speech To Text : " + transcription.text)
                 st.session_state.messages.append({"role": "user", "content": transcription.text})
                 handle_response(transcription.text, "gpt-4o-mini")
                 response = client.audio.speech.create(
