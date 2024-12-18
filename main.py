@@ -192,4 +192,5 @@ elif model == "Générateur d'articles":
         generate_article(topic)
 
 elif model == "Real Time Conversation":
-    handle_stt_to_gpt4o_to_tts_no_translation()
+    while model == "Real Time Conversation":
+        handle_stt_to_gpt4o_to_tts_no_translation()
