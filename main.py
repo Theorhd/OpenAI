@@ -28,6 +28,8 @@ def new_message(content: str, model: str):
         handle_dalle_response(content)
     elif model == "Python Code Expert":
         handle_python_expert_response(content)
+    elif model == "Whisper":
+        handle_whisper_response(content)
 
 def handle_chatgpt_response(content: str):
     with st.chat_message("assistant"):
@@ -137,6 +139,23 @@ def handle_gpt35turbo_response(content: str):
                 txt.markdown(full_text)
         st.session_state.messages.append({"role": "assistant", "content": full_text})
 
+def handle_whisper_response(content: str):
+    with st.chat_message("assistant"):
+        txt = st.header("Waiting for response...")
+        messages = st.session_state.messages + [{"role": "user", "content": content}]
+        completion = client.chat.completions.create(
+            model="whisper",
+            messages=messages,
+            stream=True
+        )
+        full_text = ""
+        for chunk in completion:
+            if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta.content is not None:
+                chunk_text = chunk.choices[0].delta.content
+                full_text += chunk_text
+                txt.markdown(full_text)
+        st.session_state.messages.append({"role": "assistant", "content": full_text})
+
 def openai_create_image(prompt: str):
     try:
         response = client.images.generate(
@@ -178,7 +197,7 @@ value = st.chat_input("Votre message ici...")
 if st.button("Clear Chat"):
     st.session_state.messages = []
 
-model = st.selectbox("Choisi ton modèle", ["GPT-4o-mini", "GPT-4o", "GPT 3.5 Turbo", "DALL-E", "Python Code Expert", "Générateur d'articles"])
+model = st.selectbox("Choisi ton modèle", ["GPT-4o-mini", "GPT-4o", "GPT 3.5 Turbo", "DALL-E", "Python Code Expert", "Générateur d'articles", "Whisper"])
 
 if value and value != "" and model != "Générateur d'articles":
     new_message(value, model)
@@ -188,3 +207,7 @@ if model == "Générateur d'articles":
     topic = st.text_input("Enter a topic for the article")
     if topic:
         generate_article(topic)
+
+elif model == "Whisper":
+    st.audio_input("Record your voice here...")
+    
