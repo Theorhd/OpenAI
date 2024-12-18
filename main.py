@@ -96,28 +96,29 @@ def handle_stt_to_gpt4o_to_tts():
             st.session_state.messages.append({"role": "assistant", "content": f"Génération de l'audio pour : {st.session_state.messages[-1]['content']}"})
             
 def handle_stt_to_gpt4o_to_tts_no_translation():
-    audio = st.audio_input("Dites quelque chose")
-    if audio:
-        file_path = Path(__file__).parent / "input.mp3"
-        with open(file_path, "wb") as file:
-            file.write(audio.getbuffer())
-        with open(file_path, "rb") as file:
-            transcription = client.audio.transcriptions.create(
-                model="whisper-1",
-                file=file
-            )
-            st.write("Transcribed text : " + transcription.text)
-            st.session_state.messages.append({"role": "user", "content": transcription.text})
-            handle_response(transcription.text, "gpt-4o-mini")
-            response = client.audio.speech.create(
-                model="tts-1",
-                voice="alloy",
-                input=st.session_state.messages[-1]["content"]
-            )
-            output_file_path = Path(__file__).parent / "output.mp3"
-            response.stream_to_file(output_file_path)
-            st.audio("output.mp3", autoplay=True)
-            st.session_state.messages.append({"role": "assistant", "content": f"Génération de l'audio pour : {st.session_state.messages[-1]['content']}"})
+    while True:
+        audio = st.audio_input("Dites quelque chose")
+        if audio:
+            file_path = Path(__file__).parent / "input.mp3"
+            with open(file_path, "wb") as file:
+                file.write(audio.getbuffer())
+            with open(file_path, "rb") as file:
+                transcription = client.audio.transcriptions.create(
+                    model="whisper-1",
+                    file=file
+                )
+                st.write("Transcribed text : " + transcription.text)
+                st.session_state.messages.append({"role": "user", "content": transcription.text})
+                handle_response(transcription.text, "gpt-4o-mini")
+                response = client.audio.speech.create(
+                    model="tts-1",
+                    voice="alloy",
+                    input=st.session_state.messages[-1]["content"]
+                )
+                output_file_path = Path(__file__).parent / "output.mp3"
+                response.stream_to_file(output_file_path)
+                st.audio("output.mp3", autoplay=True)
+                st.session_state.messages.append({"role": "assistant", "content": f"Génération de l'audio pour : {st.session_state.messages[-1]['content']}"})
             
 def handle_response(content: str, model: str):
     with st.chat_message("assistant"):
@@ -192,5 +193,4 @@ elif model == "Générateur d'articles":
         generate_article(topic)
 
 elif model == "Real Time Conversation":
-    while model == "Real Time Conversation":
-        handle_stt_to_gpt4o_to_tts_no_translation()
+    handle_stt_to_gpt4o_to_tts_no_translation()
