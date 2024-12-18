@@ -18,10 +18,6 @@ def new_message(content: str, model: str):
         handle_gpt4o_response(content)
     elif model == "GPT-4o-mini":
         handle_chatgpt_response(content)
-    elif model == "GPT-o1-mini":
-        handle_gpto1mini_response(content)
-    elif model == "GPT-o1-preview":
-        handle_gpto1preview_response(content)
     elif model == "GPT 3.5 Turbo":
         handle_gpt35turbo_response(content)
     elif model == "DALL-E":
@@ -86,40 +82,6 @@ def handle_gpt4o_response(content: str):
                 txt.markdown(full_text)
         st.session_state.messages.append({"role": "assistant", "content": full_text})
 
-def handle_gpto1mini_response(content: str):
-    with st.chat_message("assistant"):
-        txt = st.header("Waiting for response...")
-        messages = st.session_state.messages + [{"role": "user", "content": content}]
-        completion = client.chat.completions.create(
-            model="gpt-o1-mini",
-            messages=messages,
-            stream=True
-        )
-        full_text = ""
-        for chunk in completion:
-            if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta.content is not None:
-                chunk_text = chunk.choices[0].delta.content
-                full_text += chunk_text
-                txt.markdown(full_text)
-        st.session_state.messages.append({"role": "assistant", "content": full_text})
-
-def handle_gpto1preview_response(content: str):
-    with st.chat_message("assistant"):
-        txt = st.header("Waiting for response...")
-        messages = st.session_state.messages + [{"role": "user", "content": content}]
-        completion = client.chat.completions.create(
-            model="gpt-o1-preview",
-            messages=messages,
-            stream=True
-        )
-        full_text = ""
-        for chunk in completion:
-            if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta.content is not None:
-                chunk_text = chunk.choices[0].delta.content
-                full_text += chunk_text
-                txt.markdown(full_text)
-        st.session_state.messages.append({"role": "assistant", "content": full_text})
-
 def handle_gpt35turbo_response(content: str):
     with st.chat_message("assistant"):
         txt = st.header("Waiting for response...")
@@ -157,11 +119,10 @@ def generate_article(topic: str):
         messages=[
             {"role": "system", "content": "Tu es un assistant qui rédige des articles. Ta taches est de générer 3 paragraphes par sujet qui te seront demandés."},
             {"role": "user", "content": f"Rédige un article sur le sujet : {topic}"}
-        ],
-        stream=True
+        ]
     )
     article_content = completion.choices[0].message.content
-    st.markdown(article_content)
+    st.text(article_content)
     
     # Generate images
     for _ in range(2):
