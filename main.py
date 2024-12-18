@@ -21,7 +21,6 @@ def new_message(content: str, model: str):
         "GPT 3.5 Turbo": handle_gpt35turbo_response,
         "DALL-E": handle_dalle_response,
         "Python Code Expert": handle_python_expert_response,
-        "Translation": handle_translation_response,
         "TTS": handle_tts_response,
         "STT Translation": handle_whisper_stt_translation_response,
         "Real Time Conversation": handle_stt_to_gpt4o_to_tts_no_translation
@@ -203,8 +202,6 @@ if value and value != "" and model != "Générateur d'articles":
     new_message(value, model)
     value = ""
 
-elif model == "Translate":
-    handle_translation_response(value)
 elif model == "STT Translation":
     handle_whisper_stt_translation_response()
 
