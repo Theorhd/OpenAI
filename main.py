@@ -2,6 +2,7 @@ from openai import OpenAI
 import os
 import streamlit as st
 import time
+from pathlib import Path
 
 API_KEY = os.getenv("api_key")
 client = OpenAI(api_key=API_KEY)
@@ -29,7 +30,9 @@ def new_message(content: str, model: str):
     elif model == "Python Code Expert":
         handle_python_expert_response(content)
     elif model == "Whisper":
-        handle_whisper_response(content)
+        handle_whisper_response()
+    elif model == "TTS":
+        handle_tts_response(content)
 
 def handle_chatgpt_response(content: str):
     with st.chat_message("assistant"):
@@ -139,19 +142,30 @@ def handle_gpt35turbo_response(content: str):
                 txt.markdown(full_text)
         st.session_state.messages.append({"role": "assistant", "content": full_text})
 
-def handle_whisper_response(content: str):
-    with st.chat_message("assistant"):
-        txt = st.header("Waiting for transcription...")
-        audio_file = st.audio_input("Record your voice here...")
-        if audio_file:
-            audio_bytes = audio_file.read()
-            response = client.audio.transcriptions.create(
+def handle_whisper_response():
+    audio = st.audio_input("Dites quelque chose")
+    if audio:
+        file_path = Path(__file__).parent / "input.mp3"
+        with open(file_path, "wb") as file:
+            file.write(audio.getbuffer())
+        with open(file_path, "rb") as file:
+            translation = client.audio.translations.create(
                 model="whisper-1",
-                file=audio_bytes
+                file=file
             )
-            transcription = response["text"]
-            st.session_state.messages.append({"role": "assistant", "content": transcription})
-            txt.markdown(transcription)
+            st.write(translation.text)
+            st.session_state.messages.append({"role": "assistant", "content": translation.text})
+
+def handle_tts_response(content: str):
+    response = client.audio.speech.create(
+        model="tts-1",
+        voice="alloy",
+        input=content
+    )
+    file_path = Path(__file__).parent / "output.mp3"
+    response.stream_to_file(file_path)
+    st.audio("output.mp3", autoplay=True)
+    st.session_state.messages.append({"role": "assistant", "content": f"Audio generated for: {content}"})
 
 def openai_create_image(prompt: str):
     try:
@@ -194,7 +208,7 @@ value = st.chat_input("Votre message ici...")
 if st.button("Clear Chat"):
     st.session_state.messages = []
 
-model = st.selectbox("Choisi ton modèle", ["GPT-4o-mini", "GPT-4o", "GPT 3.5 Turbo", "DALL-E", "Python Code Expert", "Générateur d'articles", "Whisper"])
+model = st.selectbox("Choisi ton modèle", ["GPT-4o-mini", "GPT-4o", "GPT 3.5 Turbo", "DALL-E", "Python Code Expert", "Générateur d'articles", "Whisper", "TTS"])
 
 if value and value != "" and model != "Générateur d'articles":
     new_message(value, model)
