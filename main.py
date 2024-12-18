@@ -134,6 +134,9 @@ if value and value != "" and model != "Générateur d'articles":
     new_message(value, model)
     value = ""
 
+elif model == "Whisper":
+    handle_whisper_response()
+
 if model == "Générateur d'articles":
     topic = st.text_input("Enter a topic for the article")
     if topic:
