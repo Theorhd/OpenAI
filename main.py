@@ -96,8 +96,10 @@ def handle_stt_to_gpt4o_to_tts():
             st.session_state.messages.append({"role": "assistant", "content": f"Génération de l'audio pour : {st.session_state.messages[-1]['content']}"})
             
 def handle_stt_to_gpt4o_to_tts_no_translation():
+    audio_input_counter = 0
     while True:
-        audio = st.audio_input("Dites quelque chose")
+        audio_input_counter += 1
+        audio = st.audio_input(f"Dites quelque chose {audio_input_counter}")
         if audio:
             file_path = Path(__file__).parent / "input.mp3"
             with open(file_path, "wb") as file:
