@@ -177,7 +177,7 @@ value = st.chat_input("Votre message ici...")
 if st.button("Clear Chat"):
     st.session_state.messages = []
 
-model = st.selectbox("Choisi ton modèle", ["GPT-4o-mini", "GPT-4o", "GPT 3.5 Turbo", "DALL-E", "Python Code Expert", "Générateur d'articles", "STT Translation", "TTS", "Real Time Conversation"])
+model = st.selectbox("Choisi ton modèle", ["GPT-4o-mini", "GPT-4o", "GPT 3.5 Turbo", "DALL-E", "Python Code Expert", "Générateur d'articles", "TTS", "STT Translation", "Real Time Conversation"])
 
 if value and value != "" and model != "Générateur d'articles":
     new_message(value, model)
