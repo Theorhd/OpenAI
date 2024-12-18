@@ -97,7 +97,7 @@ def handle_stt_to_gpt4o_to_tts():
             
 def handle_stt_to_gpt4o_to_tts_no_translation():
     while True:
-        audio = st.audio_input("Dites quelque chose")
+        audio = st.audio_input("Dites quelque chose", key=str(time.time()))
         if audio:
             file_path = Path(__file__).parent / "input.mp3"
             with open(file_path, "wb") as file:
