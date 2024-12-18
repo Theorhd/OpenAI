@@ -21,8 +21,9 @@ def new_message(content: str, model: str):
         "GPT 3.5 Turbo": handle_gpt35turbo_response,
         "DALL-E": handle_dalle_response,
         "Python Code Expert": handle_python_expert_response,
+        "TTS": handle_tts_response,
         "STT Translation": handle_whisper_stt_translation_response,
-        "TTS": handle_tts_response
+        "Real Time Conversation": handle_stt_to_gpt4o_to_tts
     }
 
     if model in model_handlers:
@@ -69,6 +70,30 @@ def handle_tts_response(content: str):
     response.stream_to_file(file_path)
     st.audio("output.mp3", autoplay=True)
     st.session_state.messages.append({"role": "assistant", "content": f"Génération de l'audio pour : {content}"})
+
+def handle_stt_to_gpt4o_to_tts():
+    audio = st.audio_input("Dites quelque chose")
+    if audio:
+        file_path = Path(__file__).parent / "input.mp3"
+        with open(file_path, "wb") as file:
+            file.write(audio.getbuffer())
+        with open(file_path, "rb") as file:
+            translation = client.audio.translations.create(
+                model="whisper-1",
+                file=file
+            )
+            st.write("Translated text : " + translation.text)
+            st.session_state.messages.append({"role": "user", "content": translation.text})
+            handle_response(translation.text, "gpt-4o-mini")
+            response = client.audio.speech.create(
+                model="tts-1",
+                voice="alloy",
+                input=st.session_state.messages[-1]["content"]
+            )
+            output_file_path = Path(__file__).parent / "output.mp3"
+            response.stream_to_file(output_file_path)
+            st.audio("output.mp3", autoplay=True)
+            st.session_state.messages.append({"role": "assistant", "content": f"Génération de l'audio pour : {st.session_state.messages[-1]['content']}"})
 
 def handle_response(content: str, model: str):
     with st.chat_message("assistant"):
@@ -128,7 +153,7 @@ value = st.chat_input("Votre message ici...")
 if st.button("Clear Chat"):
     st.session_state.messages = []
 
-model = st.selectbox("Choisi ton modèle", ["GPT-4o-mini", "GPT-4o", "GPT 3.5 Turbo", "DALL-E", "Python Code Expert", "Générateur d'articles", "STT Translation", "TTS"])
+model = st.selectbox("Choisi ton modèle", ["GPT-4o-mini", "GPT-4o", "GPT 3.5 Turbo", "DALL-E", "Python Code Expert", "Générateur d'articles", "STT Translation", "TTS", "Real Time Conversation"])
 
 if value and value != "" and model != "Générateur d'articles":
     new_message(value, model)
@@ -141,3 +166,6 @@ if model == "Générateur d'articles":
     topic = st.text_input("Enter a topic for the article")
     if topic:
         generate_article(topic)
+
+if model == "Real Time Conversation":
+    handle_stt_to_gpt4o_to_tts()
