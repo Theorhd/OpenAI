@@ -29,7 +29,6 @@ def new_message(content: str, model: str):
 
     if model in model_handlers:
         model_handlers[model](content)
-    st.experimental_rerun()  # Force Streamlit to rerun the script
 
 def handle_chatgpt_response(content: str):
     handle_response(content, "gpt-4o-mini")
@@ -56,16 +55,9 @@ def handle_translation_response(content: str):
             messages=[
                 {"role": "system", "content": "Tu es un assistant qui traduit des textes. Ta tâche est de traduire des textes en différentes langues. Tu vas traduire le texte suivant dans les 6 langues les plus parlées."},
                 {"role": "user", "content": content}
-                ],
-            stream=True
+                ]
         )
-        full_text = ""
-        for chunk in response:
-            if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta.content is not None:
-                chunk_text = chunk.choices[0].delta.content
-                full_text += chunk_text
-                txt.markdown(full_text)
-        st.session_state.messages.append({"role": "assistant", "content": full_text})
+        st.markdown(response.choices[0].message.content)
 
 def handle_whisper_stt_translation_response():
     audio = st.audio_input("Dites quelque chose")
@@ -203,18 +195,14 @@ model = st.selectbox("Choisi ton modèle", ["GPT-4o-mini", "GPT-4o", "GPT 3.5 Tu
 if value and value != "" and model != "Générateur d'articles":
     new_message(value, model)
     value = ""
-    st.experimental_rerun()  # Force Streamlit to rerun the script
 
 elif model == "STT Translation":
     handle_whisper_stt_translation_response()
-    st.experimental_rerun()  # Force Streamlit to rerun the script
 
 elif model == "Générateur d'articles":
     topic = st.text_input("Enter a topic for the article")
     if topic:
         generate_article(topic)
-        st.experimental_rerun()  # Force Streamlit to rerun the script
 
 elif model == "Real Time Conversation":
     handle_stt_to_gpt4o_to_tts_no_translation()
-    st.experimental_rerun()  # Force Streamlit to rerun the script
