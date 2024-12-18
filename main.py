@@ -141,20 +141,17 @@ def handle_gpt35turbo_response(content: str):
 
 def handle_whisper_response(content: str):
     with st.chat_message("assistant"):
-        txt = st.header("Waiting for response...")
-        messages = st.session_state.messages + [{"role": "user", "content": content}]
-        completion = client.chat.completions.create(
-            model="whisper",
-            messages=messages,
-            stream=True
-        )
-        full_text = ""
-        for chunk in completion:
-            if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta.content is not None:
-                chunk_text = chunk.choices[0].delta.content
-                full_text += chunk_text
-                txt.markdown(full_text)
-        st.session_state.messages.append({"role": "assistant", "content": full_text})
+        txt = st.header("Waiting for transcription...")
+        audio_file = st.audio_input("Record your voice here...")
+        if audio_file:
+            audio_bytes = audio_file.read()
+            response = client.audio.transcriptions.create(
+                model="whisper-1",
+                file=audio_bytes
+            )
+            transcription = response["text"]
+            st.session_state.messages.append({"role": "assistant", "content": transcription})
+            txt.markdown(transcription)
 
 def openai_create_image(prompt: str):
     try:
@@ -210,4 +207,3 @@ if model == "Générateur d'articles":
 
 elif model == "Whisper":
     st.audio_input("Record your voice here...")
-    
