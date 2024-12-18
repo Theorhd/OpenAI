@@ -1,7 +1,6 @@
 from openai import OpenAI
 import os
 import streamlit as st
-import time
 
 API_KEY = os.getenv("api_key")
 client = OpenAI(api_key=API_KEY)
