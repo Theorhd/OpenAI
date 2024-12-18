@@ -55,9 +55,16 @@ def handle_translation_response(content: str):
             messages=[
                 {"role": "system", "content": "Tu es un assistant qui traduit des textes. Ta tâche est de traduire des textes en différentes langues. Tu vas traduire le texte suivant dans les 6 langues les plus parlées."},
                 {"role": "user", "content": content}
-                ]
+                ],
+            stream=True
         )
-        st.markdown(response.choices[0].message.content)
+        full_text = ""
+        for chunk in response:
+            if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta.content is not None:
+                chunk_text = chunk.choices[0].delta.content
+                full_text += chunk_text
+                txt.markdown(full_text)
+        st.session_state.messages.append({"role": "assistant", "content": full_text})
 
 def handle_whisper_stt_translation_response():
     audio = st.audio_input("Dites quelque chose")
@@ -196,6 +203,8 @@ if value and value != "" and model != "Générateur d'articles":
     new_message(value, model)
     value = ""
 
+elif model == "Translate":
+    handle_translation_response(value)
 elif model == "STT Translation":
     handle_whisper_stt_translation_response()
 
