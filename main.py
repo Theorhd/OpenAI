@@ -21,7 +21,7 @@ def new_message(content: str, model: str):
         "GPT 3.5 Turbo": handle_gpt35turbo_response,
         "DALL-E": handle_dalle_response,
         "Python Code Expert": handle_python_expert_response,
-        "Whisper": handle_whisper_response,
+        "STT Translation": handle_whisper_stt_translation_response,
         "TTS": handle_tts_response
     }
 
@@ -45,7 +45,7 @@ def handle_gpt4o_response(content: str):
 def handle_gpt35turbo_response(content: str):
     handle_response(content, "gpt-3.5-turbo")
 
-def handle_whisper_response():
+def handle_whisper_stt_translation_response():
     audio = st.audio_input("Dites quelque chose")
     if audio:
         file_path = Path(__file__).parent / "input.mp3"
@@ -56,7 +56,7 @@ def handle_whisper_response():
                 model="whisper-1",
                 file=file
             )
-            st.write(translation.text)
+            st.write("Translated text : " + translation.text)
             st.session_state.messages.append({"role": "assistant", "content": translation.text})
 
 def handle_tts_response(content: str):
@@ -134,8 +134,8 @@ if value and value != "" and model != "Générateur d'articles":
     new_message(value, model)
     value = ""
 
-elif model == "Whisper":
-    handle_whisper_response()
+elif model == "STT Translation":
+    handle_whisper_stt_translation_response()
 
 if model == "Générateur d'articles":
     topic = st.text_input("Enter a topic for the article")
