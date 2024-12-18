@@ -186,10 +186,10 @@ if value and value != "" and model != "Générateur d'articles":
 elif model == "STT Translation":
     handle_whisper_stt_translation_response()
 
-if model == "Générateur d'articles":
+elif model == "Générateur d'articles":
     topic = st.text_input("Enter a topic for the article")
     if topic:
         generate_article(topic)
 
-if model == "Real Time Conversation":
+elif model == "Real Time Conversation":
     handle_stt_to_gpt4o_to_tts_no_translation()
