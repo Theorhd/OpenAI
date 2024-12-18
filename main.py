@@ -28,11 +28,15 @@ def handle_chatgpt_response(content: str):
     with st.chat_message("assistant"):
         txt = st.header("Waiting for response...")
         messages = st.session_state.messages + [{"role": "user", "content": content}]
-        completion = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=messages,
-            stream=True
-        )
+        try:
+            completion = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=messages,
+                stream=True
+            )
+        except Exception as e:
+            st.error(f"An error occurred: {e}")
+            return
 
         full_text = ""
         for chunk in completion:
@@ -44,18 +48,24 @@ def handle_chatgpt_response(content: str):
 
 def handle_dalle_response(content: str):
     image_url = openai_create_image(content)
-    st.session_state.messages.append({"role": "assistant", "content": image_url})
-    st.image(image_url)
+    if image_url:
+        st.session_state.messages.append({"role": "assistant", "content": image_url})
+        st.image(image_url)
 
 def handle_python_expert_response(content: str):
     with st.chat_message("assistant"):
         txt = st.header("Waiting for response...")
         messages = st.session_state.messages + [{"role": "user", "content": content}]
-        completion = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=messages,
-            stream=True
-        )
+        try:
+            completion = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=messages,
+                stream=True
+            )
+        except Exception as e:
+            st.error(f"An error occurred: {e}")
+            return
+
         full_text = ""
         for chunk in completion:
             if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta.content is not None:
@@ -68,11 +78,16 @@ def handle_gpt4o_response(content: str):
     with st.chat_message("assistant"):
         txt = st.header("Waiting for response...")
         messages = st.session_state.messages + [{"role": "user", "content": content}]
-        completion = client.chat.completions.create(
-            model="gpt-4o",
-            messages=messages,
-            stream=True
-        )
+        try:
+            completion = client.chat.completions.create(
+                model="gpt-4o",
+                messages=messages,
+                stream=True
+            )
+        except Exception as e:
+            st.error(f"An error occurred: {e}")
+            return
+
         full_text = ""
         for chunk in completion:
             if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta.content is not None:
@@ -85,11 +100,16 @@ def handle_gpt35turbo_response(content: str):
     with st.chat_message("assistant"):
         txt = st.header("Waiting for response...")
         messages = st.session_state.messages + [{"role": "user", "content": content}]
-        completion = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=messages,
-            stream=True
-        )
+        try:
+            completion = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=messages,
+                stream=True
+            )
+        except Exception as e:
+            st.error(f"An error occurred: {e}")
+            return
+
         full_text = ""
         for chunk in completion:
             if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta.content is not None:
@@ -113,13 +133,18 @@ def openai_create_image(prompt: str):
 
 def generate_article(topic: str):
     st.header(f"Génération de l'article sur le sujet : {topic} ...")
-    completion = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": "Tu es un assistant qui rédige des articles. Ta taches est de générer 3 paragraphes par sujet qui te seront demandés."},
-            {"role": "user", "content": f"Rédige un article sur le sujet : {topic}"}
-        ]
-    )
+    try:
+        completion = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "Tu es un assistant qui rédige des articles. Ta taches est de générer 3 paragraphes par sujet qui te seront demandés."},
+                {"role": "user", "content": f"Rédige un article sur le sujet : {topic}"}
+            ]
+        )
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
+        return
+
     article_content = completion.choices[0].message.content
     st.text(article_content)
     
