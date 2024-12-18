@@ -15,42 +15,21 @@ def new_message(content: str, model: str):
         st.session_state.messages.append({"role": "user", "content": content})
         st.write(content)
     
-    if model == "GPT-4o":
-        handle_gpt4o_response(content)
-    elif model == "GPT-4o-mini":
-        handle_chatgpt_response(content)
-    elif model == "GPT-o1-mini":
-        handle_gpto1mini_response(content)
-    elif model == "GPT-o1-preview":
-        handle_gpto1preview_response(content)
-    elif model == "GPT 3.5 Turbo":
-        handle_gpt35turbo_response(content)
-    elif model == "DALL-E":
-        handle_dalle_response(content)
-    elif model == "Python Code Expert":
-        handle_python_expert_response(content)
-    elif model == "Whisper":
-        handle_whisper_response()
-    elif model == "TTS":
-        handle_tts_response(content)
+    model_handlers = {
+        "GPT-4o": handle_gpt4o_response,
+        "GPT-4o-mini": handle_chatgpt_response,
+        "GPT 3.5 Turbo": handle_gpt35turbo_response,
+        "DALL-E": handle_dalle_response,
+        "Python Code Expert": handle_python_expert_response,
+        "Whisper": handle_whisper_response,
+        "TTS": handle_tts_response
+    }
+
+    if model in model_handlers:
+        model_handlers[model](content)
 
 def handle_chatgpt_response(content: str):
-    with st.chat_message("assistant"):
-        txt = st.header("Waiting for response...")
-        messages = st.session_state.messages + [{"role": "user", "content": content}]
-        completion = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=messages,
-            stream=True
-        )
-
-        full_text = ""
-        for chunk in completion:
-            if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta.content is not None:
-                chunk_text = chunk.choices[0].delta.content
-                full_text += chunk_text
-                txt.markdown(full_text)
-        st.session_state.messages.append({"role": "assistant", "content": full_text})
+    handle_response(content, "gpt-4o-mini")
 
 def handle_dalle_response(content: str):
     image_url = openai_create_image(content)
@@ -58,89 +37,13 @@ def handle_dalle_response(content: str):
     st.image(image_url)
 
 def handle_python_expert_response(content: str):
-    with st.chat_message("assistant"):
-        txt = st.header("Waiting for response...")
-        messages = st.session_state.messages + [{"role": "user", "content": content}]
-        completion = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=messages,
-            stream=True
-        )
-        full_text = ""
-        for chunk in completion:
-            if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta.content is not None:
-                chunk_text = chunk.choices[0].delta.content
-                full_text += chunk_text
-                txt.markdown(full_text)
-        st.session_state.messages.append({"role": "assistant", "content": full_text})
+    handle_response(content, "gpt-4o-mini")
 
 def handle_gpt4o_response(content: str):
-    with st.chat_message("assistant"):
-        txt = st.header("Waiting for response...")
-        messages = st.session_state.messages + [{"role": "user", "content": content}]
-        completion = client.chat.completions.create(
-            model="gpt-4o",
-            messages=messages,
-            stream=True
-        )
-        full_text = ""
-        for chunk in completion:
-            if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta.content is not None:
-                chunk_text = chunk.choices[0].delta.content
-                full_text += chunk_text
-                txt.markdown(full_text)
-        st.session_state.messages.append({"role": "assistant", "content": full_text})
-
-def handle_gpto1mini_response(content: str):
-    with st.chat_message("assistant"):
-        txt = st.header("Waiting for response...")
-        messages = st.session_state.messages + [{"role": "user", "content": content}]
-        completion = client.chat.completions.create(
-            model="gpt-o1-mini",
-            messages=messages,
-            stream=True
-        )
-        full_text = ""
-        for chunk in completion:
-            if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta.content is not None:
-                chunk_text = chunk.choices[0].delta.content
-                full_text += chunk_text
-                txt.markdown(full_text)
-        st.session_state.messages.append({"role": "assistant", "content": full_text})
-
-def handle_gpto1preview_response(content: str):
-    with st.chat_message("assistant"):
-        txt = st.header("Waiting for response...")
-        messages = st.session_state.messages + [{"role": "user", "content": content}]
-        completion = client.chat.completions.create(
-            model="gpt-o1-preview",
-            messages=messages,
-            stream=True
-        )
-        full_text = ""
-        for chunk in completion:
-            if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta.content is not None:
-                chunk_text = chunk.choices[0].delta.content
-                full_text += chunk_text
-                txt.markdown(full_text)
-        st.session_state.messages.append({"role": "assistant", "content": full_text})
+    handle_response(content, "gpt-4o")
 
 def handle_gpt35turbo_response(content: str):
-    with st.chat_message("assistant"):
-        txt = st.header("Waiting for response...")
-        messages = st.session_state.messages + [{"role": "user", "content": content}]
-        completion = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=messages,
-            stream=True
-        )
-        full_text = ""
-        for chunk in completion:
-            if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta.content is not None:
-                chunk_text = chunk.choices[0].delta.content
-                full_text += chunk_text
-                txt.markdown(full_text)
-        st.session_state.messages.append({"role": "assistant", "content": full_text})
+    handle_response(content, "gpt-3.5-turbo")
 
 def handle_whisper_response():
     audio = st.audio_input("Dites quelque chose")
@@ -165,7 +68,24 @@ def handle_tts_response(content: str):
     file_path = Path(__file__).parent / "output.mp3"
     response.stream_to_file(file_path)
     st.audio("output.mp3", autoplay=True)
-    st.session_state.messages.append({"role": "assistant", "content": f"Audio generated for: {content}"})
+    st.session_state.messages.append({"role": "assistant", "content": f"Génération de l'audio pour : {content}"})
+
+def handle_response(content: str, model: str):
+    with st.chat_message("assistant"):
+        txt = st.header("Waiting for response...")
+        messages = st.session_state.messages + [{"role": "user", "content": content}]
+        completion = client.chat.completions.create(
+            model=model,
+            messages=messages,
+            stream=True
+        )
+        full_text = ""
+        for chunk in completion:
+            if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta.content is not None:
+                chunk_text = chunk.choices[0].delta.content
+                full_text += chunk_text
+                txt.markdown(full_text)
+        st.session_state.messages.append({"role": "assistant", "content": full_text})
 
 def openai_create_image(prompt: str):
     try:
